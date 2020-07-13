@@ -26,19 +26,19 @@ export class AppService implements OnModuleInit {
     return this.token;
   }
 
-  getRestaurants(params): Observable<string> {
+  getRestaurants(params: { latitude: string; longitude: string; }): Observable<string> {
     return new Observable((observer) => {
       if(!params.latitude || !params.longitude) {
         observer.error('Paramètre manquant');
         
       } else {
         
-        this.http.get('https://api.yelp.com/v3/businesses/search?latitude=' + params.latitude + '&longitude=' + params.longitude, {headers: {Authorization: 'Bearer ' + this.apiKey}}).subscribe((response) => {
+        this.http.get(this.yelpRoot + '/businesses/search?latitude=' + params.latitude + '&longitude=' + params.longitude, {headers: {Authorization: 'Bearer ' + this.apiKey}}).subscribe((response) => {
 
-        // let response_sent = response.data.businesses.map(() => {
-
-        // });
-          observer.next(response.data.businesses);
+          const parsedBusinesses = response.data.businesses.map((business) => {
+            return business;
+          });
+          observer.next(parsedBusinesses);
           observer.complete();
         });
       }
