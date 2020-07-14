@@ -8,6 +8,10 @@ describe('AppController', () => {
   let appController: AppController;
   let appService: AppService;
   let mockEasyConfig: Partial<EasyconfigService>;
+
+  mockEasyConfig = {
+    get: function(param: string) { return '';}
+  }
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       imports: [EasyconfigModule.register({path: './config/.env'}), HttpModule],
@@ -18,6 +22,14 @@ describe('AppController', () => {
     appService = await app.resolve(AppService);
     appController = new AppController(appService);
   });
+
+
+  // TODO : handle
+  describe('On module init', () => {
+    it('should properly initialize everything', () => {
+      appService['onModuleInit']();
+    })
+  })
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
@@ -32,9 +44,20 @@ describe('AppController', () => {
         return;
         
       }, (error) => {
-        expect(error).toBe('Paramètre manquant');
+        expect(error).toBe('Missing parameter');
         done();
       })
     })
-  })
+  });
+  describe('getGeocoding', () => {
+    it('should return an error since the query parameter is empty', (done) => {
+      appController.getGeocoding({q: ''}).subscribe(() => {
+        return;
+        
+      }, (error) => {
+        expect(error).toBe('Empty query parameter');
+        done();
+      })
+    })
+  });
 });
