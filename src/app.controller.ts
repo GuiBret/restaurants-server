@@ -17,4 +17,10 @@ export class AppController {
     return this.appService.getRestaurants(params);
     
   }
+
+  @Get('geocoding')
+  getGeocoding(@Query() params): Observable<any> {
+    
+    return this.appService.getGeocoding(params.q);
+  }
 }

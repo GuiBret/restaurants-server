@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit, HttpService } from '@nestjs/common';
 import { EasyconfigService } from 'nestjs-easyconfig';
 import { Observable } from 'rxjs';
 import { StandardResponse } from './interfaces/StandardResponse.interface';
+import { URLSearchParams } from 'url';
 
 
 @Injectable()
@@ -39,8 +40,14 @@ export class AppService implements OnModuleInit {
         observer.error('Paramètre manquant');
         
       } else {
+        const searchParams = {
+          categories: 'restaurants',
+          latitude: params.latitude,
+          longitude: params.longitude
+        };
+
         // TODO : add an interceptor
-        this.http.get(this.yelpRoot + '/businesses/search?categories=restaurants&latitude=' + params.latitude + '&longitude=' + params.longitude, {headers: {Authorization: 'Bearer ' + this.yelpAPIKey}}).subscribe((response) => {
+        this.http.get(this.yelpRoot + '/businesses/search?' + new URLSearchParams(searchParams).toString(), {headers: {Authorization: 'Bearer ' + this.yelpAPIKey}}).subscribe((response) => {
 
           const parsedBusinesses = response.data.businesses.map((business) => {
             
@@ -62,7 +69,24 @@ export class AppService implements OnModuleInit {
     });
   }
 
-  getGeocoding(searchString: string) {
-    // this.http.get(this.yelp)
+  getGeocoding(searchString: string) : Observable<any>{
+    
+    
+    return new Observable((observer) => {
+      const params = {
+        q: searchString,
+        apikey: this.hereAPIKey
+      };
+  
+      this.http.get(this.hereGeocodingRoot + '?' + new URLSearchParams(params).toString()).subscribe((geocoderResponse) => {
+        
+        observer.next(geocoderResponse.data);
+        observer.complete();
+      });
+      
+      
+    });
+
+
   }
 }
