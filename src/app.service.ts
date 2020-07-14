@@ -37,7 +37,7 @@ export class AppService implements OnModuleInit {
   getRestaurants(params: { latitude: string; longitude: string; }): Observable<StandardResponse> {
     return new Observable((observer) => {
       if(!params.latitude || !params.longitude) {
-        observer.error('Paramètre manquant');
+        observer.error('Missing parameter');
         
       } else {
         const searchParams = {
@@ -73,16 +73,31 @@ export class AppService implements OnModuleInit {
     
     
     return new Observable((observer) => {
-      const params = {
-        q: searchString,
-        apikey: this.hereAPIKey
-      };
-  
-      this.http.get(this.hereGeocodingRoot + '?' + new URLSearchParams(params).toString()).subscribe((geocoderResponse) => {
+      console.log("Search string");
+      if(searchString === '') {
         
-        observer.next(geocoderResponse.data);
-        observer.complete();
-      });
+        observer.error('Empty query parameter');
+        console.log('On sarrete')
+        
+      } else {
+        const params = {
+          q: searchString,
+          apikey: this.hereAPIKey
+        };
+  
+        
+    
+        this.http.get(this.hereGeocodingRoot + '?' + new URLSearchParams(params).toString()).subscribe((geocoderResponse) => {
+          const results: StandardResponse = geocoderResponse.data.items.map((currResult) => ({name: currResult.title, latitude: currResult.position.lat, longitude: currResult.position.lng}));
+          
+          observer.next({data: {results: results}, errors: []});
+          observer.complete();
+        });
+
+      }
+
+      
+      
       
       
     });
