@@ -34,7 +34,7 @@ export class AppService implements OnModuleInit {
         
       } else {
         
-        this.http.get(this.yelpRoot + '/businesses/search?latitude=' + params.latitude + '&longitude=' + params.longitude, {headers: {Authorization: 'Bearer ' + this.apiKey}}).subscribe((response) => {
+        this.http.get(this.yelpRoot + '/businesses/search?categories=restaurants&latitude=' + params.latitude + '&longitude=' + params.longitude, {headers: {Authorization: 'Bearer ' + this.apiKey}}).subscribe((response) => {
 
           const parsedBusinesses = response.data.businesses.map((business) => {
             
