@@ -7,8 +7,11 @@ import { StandardResponse } from './interfaces/StandardResponse.interface';
 @Injectable()
 export class AppService implements OnModuleInit {
   token: string;
-  apiKey: string;
+  yelpAPIKey: string;
   yelpRoot: string;
+
+  hereAPIKey: string;
+  hereGeocodingRoot: string;
 
   constructor(private http: HttpService, private config: EasyconfigService) {}
   getHello(): string {
@@ -17,8 +20,11 @@ export class AppService implements OnModuleInit {
 
   onModuleInit(): void {
     
-    this.apiKey = this.config.get('YELPAPIKEY');
+    this.yelpAPIKey = this.config.get('YELPAPIKEY');
     this.yelpRoot = this.config.get('YELPROOT');
+
+    this.hereAPIKey = this.config.get('HEREAPIKEY');
+    this.hereGeocodingRoot = this.config.get('HEREGEOCODINGROOT');
     
     
   } 
@@ -33,13 +39,11 @@ export class AppService implements OnModuleInit {
         observer.error('Paramètre manquant');
         
       } else {
-        
-        this.http.get(this.yelpRoot + '/businesses/search?categories=restaurants&latitude=' + params.latitude + '&longitude=' + params.longitude, {headers: {Authorization: 'Bearer ' + this.apiKey}}).subscribe((response) => {
+        // TODO : add an interceptor
+        this.http.get(this.yelpRoot + '/businesses/search?categories=restaurants&latitude=' + params.latitude + '&longitude=' + params.longitude, {headers: {Authorization: 'Bearer ' + this.yelpAPIKey}}).subscribe((response) => {
 
           const parsedBusinesses = response.data.businesses.map((business) => {
             
-            // return business;
-
             return {
               name: business.name,
               image: business.image_url,
@@ -56,5 +60,9 @@ export class AppService implements OnModuleInit {
       }
 
     });
+  }
+
+  getGeocoding(searchString: string) {
+    // this.http.get(this.yelp)
   }
 }
