@@ -57,8 +57,11 @@ export class AppService implements OnModuleInit {
               address: business.location.display_address.join('\r\n'),
               latitude: business.coordinates.latitude,
               longitude: business.coordinates.longitude,
+              distance: parseInt(business.distance),
               id: business.id
             }
+          }).sort((a, b) => {
+            return (a.distance > b.distance) ? 1 : -1; 
           });
           
           observer.next({data: {businesses: parsedBusinesses}, errors: []});
@@ -73,12 +76,11 @@ export class AppService implements OnModuleInit {
     
     
     return new Observable((observer) => {
-      console.log("Search string");
+      
       if(searchString === '') {
         
         observer.error('Empty query parameter');
-        console.log('On sarrete')
-        
+       
       } else {
         const params = {
           q: searchString,
